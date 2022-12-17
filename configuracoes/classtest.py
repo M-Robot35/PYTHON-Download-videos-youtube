@@ -12,6 +12,7 @@ import subprocess
 
 # ffmpeg  fazer download para converter arquivo mp4 para mp3 sem conflito
 # de alguns players
+# Download :   https://ffmpeg.org/download.html
 
 class DownloadYoutube:
     def __init__(self, link, path_Default='./download'):
@@ -98,13 +99,14 @@ class Mp3(DownloadYoutube):
         # save the file
         base, ext = os.path.splitext(out_file)
         new_file = base + '.mp3'
-        # os.rename(out_file, new_file)
+        os.rename(out_file, new_file)
         
         # result of success
         print(yt.title + " has been successfully downloaded.")
                 
-        ffmpeg = ('ffmpeg -i ' % out_file + new_file)
-        subprocess.run(ffmpeg, shell=True)
+        # ffmpeg  fazer download para converter arquivo mp4 para mp3 sem conflito
+        # de alguns players
+        # foi testado no VLC roodou normalmente
         
         
         pass

@@ -21,6 +21,7 @@ def main():
         [3] - Download Multilinks
         [4] - Link Status
         [5] - Abrir Local Download
+        [6] - Fazer Download Mp3
         
         
         [0] - Sair (Exit)
@@ -35,8 +36,7 @@ def main():
             
             if re.findall(r"^https://www.you",url):
                 try:            
-                    # Main(url).downloadUnico()
-                    Mp3(url).mp3Download()
+                    Main(url).downloadUnico()
                     print("  Download Concuido  ".center(width,"#"))
                     print("\n")  
                     sleep(warningSleep)
@@ -164,7 +164,24 @@ def main():
          # @ ABRIR PASTA DE DOWNLOADS 
         elif entrada == "5":  
             url = "https://www.youtube.com/watch?v=NvvBPPQ7DEo"
-            Main(url).openPathFile()           
+            Main(url).openPathFile()   
+            
+        # @ DOWNLOAD UNICO VIDEO
+        elif entrada == "6": 
+            url = input('Insira o link do Youtube: ')
+            
+            if re.findall(r"^https://www.you",url):
+                try:            
+                    Mp3(url).mp3Download()
+                    print("  Download Concuido  ".center(width,"#"))
+                    print("\n")  
+                    sleep(warningSleep)
+                except:
+                    print("  Download Error  ".center(width,"#"))
+                   
+            else:
+                print("  Link Invalido  ".center(width,"#"))
+                sleep(warningSleep)
         
         elif entrada == "0": 
             exit()
