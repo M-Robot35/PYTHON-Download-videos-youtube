@@ -2,68 +2,112 @@ import os, re
 from time import sleep
 from pytube import YouTube
 from pytube import Playlist
+from threading import Thread
+import subprocess
 
 # EXIGE que coloque o SELF
 # DownloadYoutube.__init__(self, link)
 
 # NÃO EXIGE que coloque o SELF
-# super().__init__(link)
 
+# ffmpeg  fazer download para converter arquivo mp4 para mp3 sem conflito
+# de alguns players
 
 class DownloadYoutube:
     def __init__(self, link, path_Default='./download'):
         
         self.link = link
         self.path_Defalult = path_Default
-        self.naoBaixados = []   
-     
+        self.lenghtList = 0   
+    
+    def checkIsList(self):
         
+        try:            
+            if len(Playlist(self.link)) > 2:
+                print('E uma lista: ', len(Playlist(self.link))," Links")
+                self.lenghtList = len(Playlist(self.link))
+                return True
+        except:
+            print("NÃO E UMA LISTA")
+            return False         
+        
+            
+            
     def clearString(self, word):        
         return re.sub("[\@\<\>\/\\\|\:]", "", word)        
                
-    def downloadUnico(self, paramList=''):
-        
-        try:
-            # print(videoStatus)
-            sleep(5)
-            videoUrl = YouTube(self.link).streams.filter(progressive = True, file_extension='mp4')
-            # pega parametros da url            
-            videoStatus = YouTube(self.link)
-        except:
-            video = {}
-            video['id']= paramList
-            video['titulo']= videoStatus.title
-            video['link']= self.link
-            self.naoBaixados.append(video)            
-            return            
+    def downloadUnico(self, paramList=''):                  
+                 
+        videoUrl = YouTube(self.link).streams.filter(progressive = True, file_extension='mp4')
         
         if paramList != '': 
-            print(f"{paramList} - ", videoStatus.title)            
+            print(f'Download: Restam - {self.lenghtList - paramList}')
             videoUrl.order_by('resolution').desc().first().download(self.path_Defalult, filename_prefix= f'0{paramList}- ' if paramList < 10 else f'{paramList}- ') 
             
         else:
+            print(f'Download: {self.link}')
             videoUrl.order_by('resolution').desc().first().download(self.path_Defalult)                   
         
                 
     def download_playlistMp4(self):
-        playLists = Playlist(self.link)    
-        path_pasta ='Mp4 - '+ playLists.title        
-        caminho_completo = os.path.join(self.path_Defalult, self.clearString(path_pasta))
-        
-        if not os.path.exists(caminho_completo): os.mkdir(caminho_completo)  
-        
-        for index, play in enumerate(playLists, start=1):     
-            self.link = play
-            self.path_Defalult = caminho_completo            
-            self.downloadUnico(index)       
+        if self.checkIsList() == True:
             
-        if self.naoBaixados != []:
-            print(self.naoBaixados)   
+            playLists = Playlist(self.link)    
+            path_pasta ='Mp4 - '+ playLists.title        
+            caminho_completo = os.path.join(self.path_Defalult, self.clearString(path_pasta))
+            
+            if not os.path.exists(caminho_completo): os.mkdir(caminho_completo)  
+            
+            for index, play in enumerate(playLists, start=1):     
+                self.link = play
+                self.path_Defalult = caminho_completo            
+                
+                inicio = Thread(target=self.downloadUnico, args=(index,))   
+                inicio.start()  # inicia o task
+                inicio.join()
+            
+            if self.naoBaixados != []:
+                print(self.naoBaixados)  
+                
+        elif self.checkIsList() == False:
+            iniciar = Thread(target=self.downloadUnico)
+            iniciar.start()
+            iniciar.join()
     
     
     def linkReturn(self):
         return self.link
+
+
+
+class Mp3(DownloadYoutube):
+    def __init__(self, link):
+        super().__init__(link)       
+     
     
+    def mp3Download(self):
+        # url input from user
+        yt = YouTube(self.link )
+        
+        # extract only audio
+        video = yt.streams.filter(only_audio=True).first()           
+        
+        # download the file
+        out_file = video.download(output_path=self.path_Defalult)
+        
+        # save the file
+        base, ext = os.path.splitext(out_file)
+        new_file = base + '.mp3'
+        # os.rename(out_file, new_file)
+        
+        # result of success
+        print(yt.title + " has been successfully downloaded.")
+                
+        ffmpeg = ('ffmpeg -i ' % out_file + new_file)
+        subprocess.run(ffmpeg, shell=True)
+        
+        
+        pass
 
 class Main(DownloadYoutube):
     def  __init__(self, link):
@@ -74,26 +118,22 @@ class Main(DownloadYoutube):
         videoUrl = YouTube(self.link) 
                      
         statusvideo = {}
-        statusvideo['titulo']=videoUrl.title
-        statusvideo['thumbnail']=videoUrl.thumbnail_url
-        statusvideo['duração']=videoUrl.length
-        statusvideo['visualizacao']=videoUrl.views
-        statusvideo['url_video']=videoUrl.embed_url
-        statusvideo['id video']=videoUrl.channel_id
-        statusvideo['canal']=videoUrl.author
-        statusvideo['url_canal']=videoUrl.channel_url
-        statusvideo['descricao']=videoUrl.description
-        statusvideo['restricao']=videoUrl.age_restricted
-        statusvideo['lenguage']=videoUrl.caption_tracks
+        statusvideo['titulo']=       videoUrl.title
+        statusvideo['thumbnail']=    videoUrl.thumbnail_url
+        statusvideo['duração']=      videoUrl.length
+        statusvideo['visualizacao']= videoUrl.views
+        statusvideo['url_video']=    videoUrl.embed_url
+        statusvideo['id video']=     videoUrl.channel_id
+        statusvideo['canal']=        videoUrl.author
+        statusvideo['url_canal']=    videoUrl.channel_url
+        statusvideo['descricao']=    videoUrl.description
+        statusvideo['restricao']=    videoUrl.age_restricted
+        statusvideo['lenguage']=     videoUrl.caption_tracks
         
         return statusvideo      
-            
-
-# linkDownload = 'https://www.youtube.com/watch?v=e-NJU2jpIkQ&list=PLHz_AreHm4dlgnTCx5Q3bY6Ms8_i77kfn'
-
-# pytube = Main(linkDownload).download_playlistMp4()
-# pytube = Main(linkDownload).downloadUnico()
-# print(pytube['visualizacao'])
-
+    def openPathFile(self):
+        print('teste ok')
+        path = os.path.join(os.path.dirname(self.path_Defalult), self.path_Defalult)
+        os.startfile(path) 
 
 

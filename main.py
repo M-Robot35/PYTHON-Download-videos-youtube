@@ -1,4 +1,4 @@
-from configuracoes.classtest import Main
+from configuracoes.classtest import *
 import re
 from threading import Thread
 from time import sleep
@@ -20,6 +20,7 @@ def main():
         [2] - Fazer Download de uma Lista de Videos
         [3] - Download Multilinks
         [4] - Link Status
+        [5] - Abrir Local Download
         
         
         [0] - Sair (Exit)
@@ -34,7 +35,8 @@ def main():
             
             if re.findall(r"^https://www.you",url):
                 try:            
-                    Main(url).downloadUnico()
+                    # Main(url).downloadUnico()
+                    Mp3(url).mp3Download()
                     print("  Download Concuido  ".center(width,"#"))
                     print("\n")  
                     sleep(warningSleep)
@@ -96,7 +98,7 @@ def main():
                                     multlinks.append(link)
                                     print(f"Links Nº : {len(multlinks)}") 
                                     
-                                    if len(multlinks) >= 5: break  # Limita a 7 Links para download
+                                    if len(multlinks) >= 10: break  # Limita a 7 Links para download
                                 
                             if link == "0": break       
                     
@@ -106,30 +108,25 @@ def main():
                             sleep(warningSleep) 
                         
                     if len(multlinks) > 0:
-                                                
-                        for video in multlinks:
-                            try:
-                                try:            
-                                    iniciar = Thread(target=Main(video).download_playlistMp4())
-                                    iniciar.start()  # inicia o task
-                                    iniciar.join() # aguarda terminar para ir para a proxima
-                                    print("  Download Concuido  ".center(width,"#"))  
-                                    print("\n")  
-                                    sleep(warningSleep)                    
-                                except:                        
-                                        iniciar = Thread(target=Main(video).downloadUnico())
-                                        iniciar.start()
-                                        iniciar.join()
-                                        print("  Download Concuido  ".center(width,"#"))
+                        while (len(multlinks)!= 0):
+                            for video in multlinks:
+                                try:
+                                    try:
+                                        Main(video).download_playlistMp4()
+                                        print(f" [{len(multlinks)}] Download Concuido  ".center(width,"#"))  
                                         print("\n")  
+                                        multlinks.pop(0)
+                                        sleep(warningSleep)                   
+                                    except:                                        
+                                        Main(video).downloadUnico()
+                                        print(f" [{len(multlinks)}] Download Concuido  ".center(width,"#"))
+                                        print("\n")  
+                                        multlinks.pop(0)
                                         sleep(warningSleep)
-                            except:
-                                print('Error Download')
-                                print("\n")  
-                                sleep(warningSleep)
-                                    
-                            multlinks.pop(0)
-                                    
+                                except:
+                                        print('Error Download')
+                                        print("\n")  
+                                        sleep(warningSleep)                                  
                             
                                                 
                 elif selecionar == "2":                     
@@ -163,7 +160,12 @@ def main():
                 print("  Link Invalido  ".center(width,"#"))
                 print("\n")  
                 sleep(warningSleep)
-            
+        
+         # @ ABRIR PASTA DE DOWNLOADS 
+        elif entrada == "5":  
+            url = "https://www.youtube.com/watch?v=NvvBPPQ7DEo"
+            Main(url).openPathFile()           
+        
         elif entrada == "0": 
             exit()
 
