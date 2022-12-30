@@ -1,0 +1,14 @@
+INSTALAÇÃO 
+
+# @ CRIAR VENV PARA FAZER INSTALAÇÃO SOMENTE PARA ESSE PROJETO
+
+commandos
+
+[1] =>  python -m venv youtube 
+
+[2] =>  ./youtube/Scripts/Activate.ps1
+
+[3] =>  pip install pytube
+
+# @ DOCUMENTAÇÃO PYTUBE
+https://pytube.io/en/latest/user/install.html
