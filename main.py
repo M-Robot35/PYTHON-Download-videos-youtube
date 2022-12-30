@@ -21,8 +21,7 @@ def main():
         [3] - Download Multilinks
         [4] - Link Status
         [5] - A2brir Local Download
-        [6] - Fazer Download Mp3
-        
+        [6] - Fazer Download Mp3        
         
         [0] - Sair (Exit)
         

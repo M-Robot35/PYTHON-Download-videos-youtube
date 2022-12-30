@@ -20,6 +20,7 @@ class DownloadYoutube:
         self.path_Defalult = path_Default
         self.lenghtList = 0   
         self.fileSizeFull = 0
+        self.nameFileDownload = ''
     
     def checkIsList(self):
         
@@ -37,34 +38,42 @@ class DownloadYoutube:
         
         if bytes_remaining != 0:
             porcentagem = 100 * (self.fileSizeFull / bytes_remaining) 
-            bar = "|" * int(porcentagem) + "-" * (100 - int(porcentagem))
-            print(f"\r| {bar} | {porcentagem:.2f}%", end="\r")
+            if porcentagem > 110:
+                porcentagem = 50  
+                bar = "|" * int(porcentagem) + "-" * (100 - int(porcentagem))
+                print(f"\r| {bar} | {porcentagem:.2f}%", end="\r")
+            
+            else:
+                bar = "|" * int(porcentagem) + "-" * (100 - int(porcentagem))
+                print(f"\r| {bar} | {porcentagem:.2f}%", end="\r")
         else:
             porcentagem = 100  
             bar = "|" * int(porcentagem) + "-" * (100 - int(porcentagem))
-            print(f"\r| {bar} | {porcentagem:.2f}%", end="\r")
+            print(f"\r| {bar} | {porcentagem:.2f}%")
+        
 
     def fileSize(self):
         videoUrl = YouTube(self.link)
         chunck = videoUrl.streams.filter(only_audio = True).first()
         file = chunck.filesize
         self.fileSizeFull= file
+
+        self.nameFileDownload = videoUrl.title
     
     def clearString(self, word):        
         return re.sub("[\@\<\>\/\\\|\:]", "", word)  
-              
+
                
     def downloadUnico(self, paramList=''):                  
         self.fileSize()
-        # videoUrl = YouTube(self.link).streams.filter(progressive = True, file_extension='mp4')
         videoUrl = YouTube(self.link, on_progress_callback=self.progressBar).streams.filter(progressive = True, file_extension='mp4')
         
         if paramList != '': 
-            print(f'Download: Restam - {self.lenghtList - paramList}')
+            print(f' Download: Restam - {self.lenghtList - paramList} => {self.nameFileDownload}')
             videoUrl.order_by('resolution').desc().first().download(self.path_Defalult, filename_prefix= f'0{paramList}- ' if paramList < 10 else f'{paramList}- ') 
             
         else:
-            print(f'Download: {self.link}')
+            print(f'Download:  => {self.nameFileDownload}')
             videoUrl.order_by('resolution').desc().first().download(self.path_Defalult)                   
         
                 
