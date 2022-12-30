@@ -4,7 +4,7 @@ from threading import Thread
 from time import sleep
 
 def main():
-    
+
     width = 50
     warningSleep = 4
     multlinks = []
@@ -20,7 +20,7 @@ def main():
         [2] - Fazer Download de uma Lista de Videos
         [3] - Download Multilinks
         [4] - Link Status
-        [5] - Abrir Local Download
+        [5] - A2brir Local Download
         [6] - Fazer Download Mp3
         
         
@@ -28,8 +28,11 @@ def main():
         
         """
         print(menu)
-        entrada = input('Digite uma das opções: ')
+        entrada = input('Digite uma das opções: ') 
         
+        while( entrada == ""):
+            entrada = input('Digite uma das opções: ')
+
         # @ DOWNLOAD UNICO VIDEO
         if entrada == "1": 
             url = input('Insira o link do Youtube: ')
@@ -37,41 +40,23 @@ def main():
             if re.findall(r"^https://www.you",url):
                 try:            
                     Main(url).downloadUnico()
-                    print("  Download Concuido  ".center(width,"#"))
-                    print("\n")  
-                    sleep(warningSleep)
+                    notifyClient("Download Concuido", warningSleep)
                 except:
-                    print("  Download Error  ".center(width,"#"))
+                    notifyClient("Download Error", warningSleep)
                    
             else:
-                print("  Link Invalido  ".center(width,"#"))
-                sleep(warningSleep)
+                notifyClient("Link Invalido", warningSleep)
             
         # @ DOWNLOAD LISTA DE VIDEOS 
         elif entrada == "2":             
             url = input('Insira o link do Youtube: ')
             
             if re.findall(r"^https://www.you",url):
-                try:            
-                    Main(url).download_playlistMp4()
-                except:
-                    opcoes = """
-                    Não ah Lista de Videos, Deseja fazer um
-                    único download  ?
-                    
-                    [1] - SIM
-                    [2] - NÃO                    
-                    """
-                    print(opcoes)
-                    select = input("Digite uma das Opções: ")
-                    if select == "1": 
-                        Main(url).downloadUnico()
-                        print("  Download Concuido  ".center(width,"#"))
-                        print("\n")  
-                        sleep(warningSleep)
+                Main(url).download_playlistMp4()
+                notifyClient("Download Concuido", warningSleep)
+                
             else:
-                print("  Link Invalido  ".center(width,"#"))
-                sleep(warningSleep)
+                notifyClient("Link Invalido", warningSleep)
                 
         
         # DOWNLOAD MULTI LINKS
@@ -103,9 +88,7 @@ def main():
                             if link == "0": break       
                     
                         else:
-                            print("\n  Link Invalido  ".center(width,"#"))
-                            print("\n")  
-                            sleep(warningSleep) 
+                            notifyClient("Link Invalido", warningSleep)
                         
                     if len(multlinks) > 0:
                         while (len(multlinks)!= 0):
@@ -124,9 +107,7 @@ def main():
                                         multlinks.pop(0)
                                         sleep(warningSleep)
                                 except:
-                                        print('Error Download')
-                                        print("\n")  
-                                        sleep(warningSleep)                                  
+                                        notifyClient("Error Download", warningSleep)
                             
                                                 
                 elif selecionar == "2":                     
@@ -152,14 +133,11 @@ def main():
                     print(banner)
                     input('Enter para Sair: ')
                 except:
-                    print("  Download Error  ".center(width,"#"))
-                    print("\n")  
-                    sleep(warningSleep)
+                    notifyClient("Download Error", warningSleep)
                    
             else:
-                print("  Link Invalido  ".center(width,"#"))
-                print("\n")  
-                sleep(warningSleep)
+                notifyClient("Link Invalido", warningSleep)
+                
         
          # @ ABRIR PASTA DE DOWNLOADS 
         elif entrada == "5":  
@@ -173,18 +151,23 @@ def main():
             if re.findall(r"^https://www.you",url):
                 try:            
                     Mp3(url).mp3Download()
-                    print("  Download Concuido  ".center(width,"#"))
-                    print("\n")  
-                    sleep(warningSleep)
+                    notifyClient("Download Concuido", warningSleep)
+
                 except:
-                    print("  Download Error  ".center(width,"#"))
+                    notifyClient("Download Error", warningSleep)
+
                    
             else:
-                print("  Link Invalido  ".center(width,"#"))
-                sleep(warningSleep)
+                notifyClient("Link Invalido", warningSleep)
         
         elif entrada == "0": 
             exit()
+
+
+def notifyClient(msg:str, wait:int, width:int=50)->None:
+    print('\n')
+    print(f"  {msg}  ".center(width,"#"))
+    sleep(wait)
 
 if __name__ == '__main__':
     main()

@@ -1,7 +1,6 @@
 INSTALAÇÃO 
 
 # @ CRIAR VENV PARA FAZER INSTALAÇÃO SOMENTE PARA ESSE PROJETO
-
 commandos
 
 [1] =>  python -m venv youtube 
@@ -11,4 +10,26 @@ commandos
 [3] =>  pip install pytube
 
 # @ DOCUMENTAÇÃO PYTUBE
-https://pytube.io/en/latest/user/install.html
+# https://pytube.io/en/latest/user/install.html
+
+# @ TRANSFORMAR EM UM ARQUIVO EXECUTAVEL 
+required
+
+[1] =>  pip install --upgrade pyinstaller
+
+[2] =>  pyinstaller --onefile  main.py    
+
+# PODE DELETAR A PASTA [ build ]  RETIRAR O EXECUTAVEL DE DENTRO DA PASTA [ dist ]
+# E COLOCAR NA RAIZ [ no memso lugar onde esta o arquivo main.py ]  APÓS FAZER, PODE ESTAR EXCLUINDO A PASTA [ dist ]
+
+# DOCUMENTAÇÃO PYINSTALLER
+https://pyinstaller.org/en/stable/operating-mode.html
+
+
+# @ BARRA DE PROGRESSO 
+
+# porcentagem = 100 * (self.fileSizeFull / bytes_remaining)     
+# @ REGRESSIVO    
+# porcentagem= ((bytes_remaining - self.fileSizeFull) / bytes_remaining ) *100
+# bar = "|" * int(porcentagem) + "-" * (100 - int(porcentagem))
+# print(f"\r| {bar} | {porcentagem:.2f}%", end="\r")

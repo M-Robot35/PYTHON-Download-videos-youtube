@@ -3,7 +3,6 @@ from time import sleep
 from pytube import YouTube
 from pytube import Playlist
 from threading import Thread
-import subprocess
 
 # EXIGE que coloque o SELF
 # DownloadYoutube.__init__(self, link)
@@ -20,6 +19,7 @@ class DownloadYoutube:
         self.link = link
         self.path_Defalult = path_Default
         self.lenghtList = 0   
+        self.fileSizeFull = 0
     
     def checkIsList(self):
         
@@ -29,17 +29,35 @@ class DownloadYoutube:
                 self.lenghtList = len(Playlist(self.link))
                 return True
         except:
-            print("NÃO E UMA LISTA")
+            # print("NÃO E UMA LISTA")
             return False         
         
             
-            
+    def progressBar(self,stream=None, chunk=None, bytes_remaining=None):
+        
+        if bytes_remaining != 0:
+            porcentagem = 100 * (self.fileSizeFull / bytes_remaining) 
+            bar = "|" * int(porcentagem) + "-" * (100 - int(porcentagem))
+            print(f"\r| {bar} | {porcentagem:.2f}%", end="\r")
+        else:
+            porcentagem = 100  
+            bar = "|" * int(porcentagem) + "-" * (100 - int(porcentagem))
+            print(f"\r| {bar} | {porcentagem:.2f}%", end="\r")
+
+    def fileSize(self):
+        videoUrl = YouTube(self.link)
+        chunck = videoUrl.streams.filter(only_audio = True).first()
+        file = chunck.filesize
+        self.fileSizeFull= file
+    
     def clearString(self, word):        
-        return re.sub("[\@\<\>\/\\\|\:]", "", word)        
+        return re.sub("[\@\<\>\/\\\|\:]", "", word)  
+              
                
     def downloadUnico(self, paramList=''):                  
-                 
-        videoUrl = YouTube(self.link).streams.filter(progressive = True, file_extension='mp4')
+        self.fileSize()
+        # videoUrl = YouTube(self.link).streams.filter(progressive = True, file_extension='mp4')
+        videoUrl = YouTube(self.link, on_progress_callback=self.progressBar).streams.filter(progressive = True, file_extension='mp4')
         
         if paramList != '': 
             print(f'Download: Restam - {self.lenghtList - paramList}')
@@ -67,8 +85,6 @@ class DownloadYoutube:
                 inicio.start()  # inicia o task
                 inicio.join()
             
-            if self.naoBaixados != []:
-                print(self.naoBaixados)  
                 
         elif self.checkIsList() == False:
             iniciar = Thread(target=self.downloadUnico)
@@ -134,7 +150,6 @@ class Main(DownloadYoutube):
         
         return statusvideo      
     def openPathFile(self):
-        print('teste ok')
         path = os.path.join(os.path.dirname(self.path_Defalult), self.path_Defalult)
         os.startfile(path) 
 
